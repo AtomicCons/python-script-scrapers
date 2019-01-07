@@ -26,10 +26,15 @@ urlArr = []
 
 #sets url to get data
 url = input('URL containing PDF links: ')
+if url.startswith('http') == False:
+    url = input('Please put the URL with the protocol.. hint. https:// or http://')
 
 urlArr = url.split('/')
+
 #get site
-site = urlArr[3]
+protocol = urlArr[0]
+site = urlArr[2]
+
 
 #get data
 response = requests.get(url,verify=False)
@@ -51,13 +56,21 @@ class dataParser(HTMLParser):
 parser = dataParser()
 parser.feed(response.text)
 for item in linkArr:
-    print(item)
+    iArr = item.split('/')
+    filename = iArr[-1]
     if item.startswith('htt'):
-        print('full link')
+        link = item
+        print('filename: ' + filename + '   whole link  Link: '+ link)
     elif item.startswith('.'):
-        print('relative to page')
+        link = url+item
+        print('filename: ' + filename + ' starts with .  Link: '+ link)
     elif item.startswith('/'):
-        print('url from site')
+        link = protocol+site+item
+        #link = link.replace('//','/')
+        print('filename: '+filename + 'starts with /  Link: '+link)
+    else:
+        print(url+'/'+filename + ' not sure')
+
 
 #checks if file exists.Downloads file if it doesn't
 # for item in fileArr:
