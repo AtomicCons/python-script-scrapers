@@ -1,4 +1,4 @@
-#!/bin/python3
+#  !/bin/python3
 import os
 import sys
 import urllib3
@@ -6,49 +6,51 @@ import requests
 import shutil
 import html
 import array
+from html.parser import HTMLParser
 
-#disables ssl warning
+# disables ssl warning
 urllib3.disable_warnings()
 
-#change directory
+# change directory
 home = os.environ['HOME']
 folder = input('Name a folder: ')
 
-#check if direcotry exists
-if os.path.exists(home+'/'+folder) == False:
+# check if direcotry exists
+if os.path.exists(home+'/'+folder) is False:
     os.mkdir(home+'/'+folder)
 os.chdir(home+'/'+folder)
 print('current dir: '+os.getcwd())
-#sets array variables
+# sets array variables
 linkArr = []
 urlArr = []
 
-#sets url to get data
+# sets url to get data
 url = input('URL containing PDF links: ')
 
-while url.startswith('http') == False:
-    url = input('Please put the URL with the protocol.. hint. https:// or http:// : ')
+while url.startswith('http') is False:
+    url = input('Please put the URL with the protocol.')
 
 urlArr = url.split('/')
 
-#get site
+# get site
 protocol = urlArr[0]
 site = urlArr[2]
 
-#get data
-response = requests.get(url,verify=False)
+# get data
+response = requests.get(url, verify=False)
 
-#sets htmlParser Params
-from html.parser import HTMLParser
+# sets htmlParser Params
+
 class dataParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
             for name, value in attrs:
-                if name == "href" and value.endswith('pdf'):
+                if name == "href" and 'pdf' in value:
                     print('Found '+value+'. Adding to que')
                     linkArr.append(value)
 
-#parses data
+
+# parses data
 parser = dataParser()
 parser.feed(response.text)
 for item in linkArr:
@@ -60,7 +62,7 @@ for item in linkArr:
         link = url+item
     elif item.startswith('/'):
         path = site+'//'+item
-        path = path.replace('//','/')
+        path = path.replace('//', '/')
         link = protocol+'//'+path
     else:
         link = protocol+'//'+site+'/'+item
@@ -69,7 +71,7 @@ for item in linkArr:
     if os.path.exists(item):
         print(item + 'exsits; skipping.')
     else:
-        print('starting download of '+ item)
+        print('starting download of ' + item)
         itemURL = link
 
         def download_file(itemURL):
